@@ -72,7 +72,7 @@ Judge the reasoning, not the tone or how confident it sounds.
    missing? Give a counterexample or a missing consideration if you can.
 
 3. WHAT ALL FIVE MISSED. What should the council consider that none of the five
-responses raised?
+   responses raised?
 
 Under 250 words. Be direct.
 ```
@@ -80,6 +80,6 @@ Under 250 words. Be direct.
 ## Handling the output
 
 - Give the chairman all five reviews with the mapping revealed.
-- If a review doesn't follow the three-part format or runs far over length, re-run that reviewer once. If it fails again, proceed with four and note it in the report.
+- If a review does not answer all three required questions or runs far over length, re-run that reviewer once. If it fails again, proceed with four reviewers and note the omission in the report.
 - Don't summarize or pre-digest the reviews for the chairman. The chairman reads them as written.
 - In Round 2, reviewers also receive the crux. See `round-2.md` for the one change to the prompt.

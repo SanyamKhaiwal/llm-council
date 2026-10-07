@@ -24,7 +24,7 @@ Round 2 does not run when:
 
 ## Sanity-check the crux
 
-Before spawning anything, read the `CRUX:` line. It must be exactly one decision-relevant question that reasoning can resolve. If it is compound (joined by "and" or "or") or plainly depends on a fact nobody has, send it back to the chairman once with that note. If the second attempt still fails the check, treat the gate as `INSUFFICIENT`, with the crux as the missing information.
+Before spawning anything, read the `CRUX:` line. It must be exactly one decision-relevant question that reasoning can resolve.If it is compound (joined by "and" or "or") or plainly depends on a fact nobody has, send it back to the chairman once with that note. If the second attempt still fails the check, treat the gate as INSUFFICIENT and state the specific missing information or evidence in the verdict.
 
 ## What Round 2 advisors receive
 
@@ -78,7 +78,7 @@ The shared rules (work alone, flag assumptions, don't invent facts, 150-300 word
 
 ## Round 2 peer review
 
-Follow `peer-review.md` with a new random shuffle, and two changes:
+Follow `peer-review.md` with a new random shuffle. Keep all of its rules, including anonymization, reviewer independence, and the reviewer output requirements. Make only these two changes:
 
 - Add the crux to the reviewer prompt, after the framed question: "The council is investigating this specific crux: [crux]."
 - Reword question 3 to: "What did all five miss about the crux?"
@@ -90,7 +90,7 @@ Everything else, including the anonymization and the question 1 and 2 structure,
 Follow `chairman.md`, with these differences:
 
 - **Gates available:** `FINAL` or `INSUFFICIENT` only. `ROUND_2` is not available.
-- **Round 1 is a hypothesis.** The chairman receives the Round 1 chairman output (the verdict or interim lean, the assumptions, the disagreements) and treats it as a claim to test against Round 2, not a conclusion to confirm. Don't carry over Round 1 confidence automatically.
+- **Round 1 is a hypothesis, not evidence** The chairman receives the Round 1 chairman output (the verdict or interim lean, the assumptions, the disagreements) and treats it as a claim to test against Round 2, not a conclusion to confirm. Reuse a Round 1 claim only when Round 2 independently supports it. Don't carry over Round 1 confidence automatically.
 - **Inputs:** Round 1 chairman output, the crux, all five Round 2 advisor responses, all five Round 2 reviews, and the anonymization mapping. Round 1 advisor responses stay in the transcript. The chairman doesn't need them.
 - **Add this section** to the verdict body, directly after the Verdict:
 

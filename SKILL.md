@@ -37,6 +37,7 @@ Round 2 is the final reasoning pass, and there is at most one per council run. A
 ## Verdict types
 
 Every final verdict is exactly one of these (definitions in `references/chairman.md`):
+
 - **RECOMMENDATION**: enough evidence to choose.
 - **CONDITIONAL RECOMMENDATION**: choose X if assumption Y holds, with a cheap way to test Y.
 - **INSUFFICIENT INFORMATION**: can't reliably choose yet. Names the missing information and the next action.
