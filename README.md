@@ -22,19 +22,21 @@ It is **not a voting system** and it is not designed to manufacture certainty. I
 
 ---
 
-## What the council actually does
+## The 5 Advisors
 
-### Five different ways of looking at the problem
+Each advisor has a different job. They run independently, so nobody gets to anchor the others.
 
-Each advisor has a different job:
+| Advisor | Role | The question they're trying to answer |
+|---|---|---|
+| **Contrarian** | Hunts for failure modes, bad assumptions, and risks. | *"What's wrong with this, and what could actually kill it?"* |
+| **First Principles** | Strips the problem down and questions the assumptions behind it. | *"Are we even solving the right problem?"* |
+| **Expansionist** | Looks for upside, opportunities, and possibilities everyone else might miss. | *"What happens if this works better than expected?"* |
+| **Outsider** | Looks at the raw question without insider context, history, or workspace knowledge. | *"What would a smart stranger see here?"* |
+| **Executor** | Focuses on feasibility, first steps, blockers, and practical execution. | *"Cool idea. How do we actually ship it?"* |
 
-- **Contrarian** — looks for what can go wrong and which risk actually matters.
-- **First Principles** — questions whether you're solving the right problem in the first place.
-- **Expansionist** — looks for upside, opportunities, and possibilities others may be missing.
-- **Outsider** — reacts to the question with no insider context or history.
-- **Executor** — ignores the theory and asks: *can we actually do this, and what happens first?*
+The point isn't that one advisor is "the correct one."
 
-They work independently, so the first advisor doesn't quietly become the answer everyone else agrees with.
+The point is that **different failure modes get a chance to speak before the decision is made.**
 
 ### Then they criticize each other
 
@@ -65,6 +67,7 @@ It looks at:
 It can also stop the process instead of forcing an answer.
 
 ---
+
 
 ## The part I care about most: knowing when not to answer
 
