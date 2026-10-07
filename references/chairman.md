@@ -11,6 +11,7 @@ The chairman turns five advisor responses and five peer reviews into a verdict, 
 - Verdict types
 - Confidence
 - Chairman prompt template
+- Round 2 chairman prompt
 
 ## Inputs
 
@@ -20,7 +21,7 @@ The chairman receives:
 - All five advisor responses, de-anonymized (the chairman needs to know which advisor said what).
 - All five peer reviews, with the anonymization mapping revealed.
 - A note that the Outsider worked from the raw question only. Do not penalize the Outsider for missing context or details. Its value is what fresh eyes noticed.
-- In Round 2 only: the crux and R1 material. See `round-2.md` for how R1 is presented.
+- In Round 2 only: the crux and the structured Round 1 Findings Handoff. See `round-2.md` for how the handoff is used.
 
 ## How to synthesize
 
@@ -50,13 +51,20 @@ The chairman may side with a minority view if its reasoning is strongest. Majori
 
 After synthesizing, the chairman picks exactly one state. Evaluate in this order:
 
-**1. Is there a crux that would change the answer?**
-The crux is exactly one decision-relevant question: the unresolved question that, if answered differently, would flip or materially weaken the recommendation. No compound cruxes. A question joined by "and" or "or" is usually two questions. Split it and identify the single question whose answer could most materially change the recommendation; move the remaining issues to Critical Assumptions or What Could Change the Verdict. Do not manufacture a crux merely to justify another round. If no such question exists, the answer is `FINAL`. Don't invent a crux to justify another round.
+### 1. Is there a crux that would change the answer?
 
-**2. Can the crux be resolved by user clarification?**
+The crux is exactly one decision-relevant question: the unresolved question that, if answered differently, would flip or materially weaken the recommendation.
+
+No compound cruxes. A question joined by "and" or "or" is usually two questions. Split it and identify the single question whose answer could most materially change the recommendation; move the remaining issues to Critical Assumptions or What Could Change the Verdict.
+
+Do not manufacture a crux merely to justify another round. If no such question exists, the answer is `FINAL`. Don't invent a crux to justify another round.
+
+### 2. Can the crux be resolved by user clarification?
+
 Choose `CLARIFY` when the crux depends on a user-specific fact, preference, constraint, goal, or other information that only the user can reliably provide, and that information could materially change the decision.
 
 The clarification must:
+
 - Ask exactly one concise question.
 - Request information the council cannot reliably infer.
 - Be directly relevant to the decision.
@@ -65,16 +73,17 @@ The clarification must:
 
 If clarification would not materially affect the decision, do not ask it.
 
-**3. If not, can reasoning resolve the crux?**
+### 3. If not, can reasoning resolve the crux?
+
 A crux is reasoning-resolvable when it is a conflict in logic between advisors, an option nobody examined properly, a framing question ("are we solving the right problem?"), or an assumption that advisors could test against the information already in the framed question.
 
-**4. Pick the state:**
+### 4. Pick the state
 
 - `GATE: FINAL` when no unresolved crux could materially change the recommendation, or when the remaining uncertainty does not prevent a useful recommendation and is explicitly disclosed. Uncertainty is acceptable only when every plausible value of the unknown leads to the same choice, or when the decision can be made conditionally with actionable branches. If the uncertainty affects the decision and the user can check it cheaply, finalize as a Conditional Recommendation instead.
 
 - `GATE: CLARIFY` when the crux depends on one user-specific piece of information that could materially change the decision and the user can provide it directly. Ask exactly one concise question.
 
-- `GATE: ROUND_2` only when ALL of these hold:
+- `GATE: ROUND_2` only when **all** of these hold:
   - You can name exactly one decision-relevant question as the crux.
   - It is reasoning-resolvable.
   - The verdict can't be firm without it.
@@ -88,110 +97,7 @@ If the crux is evidence-dependent, do not choose `ROUND_2` even when it is tempt
 
 The first lines of the chairman's output are always these fields, exactly, so the orchestrator can route without interpreting prose:
 
-```
+```text
 GATE: FINAL | CLARIFY | ROUND_2 | INSUFFICIENT
 TYPE: RECOMMENDATION | CONDITIONAL | INSUFFICIENT_INFORMATION | NONE
 CRUX: <exactly one decision-relevant question when GATE is CLARIFY or ROUND_2; otherwise omit this line>
-```
-
-Mapping:
-- `FINAL` goes with `RECOMMENDATION` or `CONDITIONAL`.
-- `CLARIFY` goes with `NONE`.
-- `INSUFFICIENT` goes with `INSUFFICIENT_INFORMATION`.
-- `ROUND_2` goes with `NONE`.
-
-### Body when GATE is FINAL or INSUFFICIENT
-
-```
-## Verdict
-[the verdict, in the form for its type below]
-
-## Where the Council Agrees
-## Where the Council Clashes
-## Critical Assumptions
-[each marked Verified Fact / User-Stated Fact / Evidence / Inference / Assumption / Unknown]
-## Evidence Quality
-## Blind Spots the Council Caught
-## What Could Change the Verdict
-## The One Thing to Do First
-[a single concrete step, not a list]
-```
-
-### Body when GATE is CLARIFY
-
-```text
-## Clarification Needed
-[the single question the user needs to answer]
-
-## Why It Matters
-[one or two sentences explaining why the answer could materially change the decision]
-```
-### Body when GATE is ROUND_2
-
-## Crux
-[the one question, stated neutrally]
-
-## Why Reasoning Can Resolve It
-[one or two sentences]
-
-## Open Questions for Round 2
-[the unresolved disagreement and assumptions, phrased as open questions with
-no recommendation embedded in them. This section is what Round 2 advisors see.]
-
-## Interim Lean (internal)
-[the chairman's current leaning and confidence. Goes in the transcript only. Never shown to Round 2 advisors. This is a hypothesis for the next reasoning pass, not evidence for the conclusion.]
-
-## Verdict types
-
-**RECOMMENDATION.** There is enough evidence to choose. State the choice plainly, the reasoning, and the confidence. Do not hedge with "it depends." If it truly depends, that is a Conditional Recommendation.
-
-**CONDITIONAL RECOMMENDATION.** The right choice turns on an assumption the council can't settle. Format: choose X if Y holds, otherwise Z. Always include how the user can check Y cheaply (a question to ask, a number to look up, a small test). A condition the user can't test is not useful.
-
-**INSUFFICIENT INFORMATION.** The council can't reliably choose yet. Include:
-- The missing information, named specifically.
-- Why reasoning can't supply it.
-- The next action to get it (who to ask, what to measure, what test to run).
-- A low-confidence lean: "If you had to choose today, the lean is X, with low confidence, because Y." Label it clearly as a lean, not a recommendation. Users will ask for it anyway, and it is honest when labeled.
-
-## Confidence
-
-Every verdict states:
-
-- **Confidence:** High, Medium, or Low.
-- **Main uncertainty:** the single biggest thing that could make this wrong.
-- **What would change it:** the specific facts or events that would flip the verdict.
-
-These are the chairman's judgment, not measurements. Models tend to be overconfident, so default one notch lower when the critical assumptions are mostly Inference or Assumption.
-
-## Chairman prompt template
-
-```
-You are the Chairman of an LLM Council. Five advisors analyzed a question
-independently, then reviewed each other anonymously. Decide whether the council
-has a reliable verdict, and if not, what is missing. Do not optimize for
-producing an answer. Optimize for the most reliable decision the available
-information allows. Never manufacture certainty.
-
-QUESTION:
----
-[framed question]
----
-
-NOTE: The Outsider worked from the raw question only, by design. Do not
-penalize it for missing context.
-
-ADVISOR RESPONSES:
-**The Contrarian:** [response]
-**The First Principles Thinker:** [response]
-**The Expansionist:** [response]
-**The Outsider:** [response]
-**The Executor:** [response]
-
-PEER REVIEWS:
-[all five reviews, with the anonymization mapping revealed]
-
-Follow references/chairman.md. Begin your output with the GATE, TYPE, and
-(if applicable) CRUX lines, exactly as specified, then the body for that
-gate state. Be direct. You may side with a minority view if its reasoning is
-strongest. If agreement among advisors rests on an unverified fact, say so.
-```

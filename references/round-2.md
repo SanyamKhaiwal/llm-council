@@ -24,25 +24,43 @@ Round 2 does not run when:
 
 ## Sanity-check the crux
 
-Before spawning anything, read the `CRUX:` line. It must be exactly one decision-relevant question that reasoning can resolve.If it is compound (joined by "and" or "or") or plainly depends on a fact nobody has, send it back to the chairman once with that note. If the second attempt still fails the check, treat the gate as INSUFFICIENT and state the specific missing information or evidence in the verdict.
+Before spawning anything, read the `CRUX:` line. It must be exactly one decision-relevant question that reasoning can resolve. If it is compound (joined by "and" or "or") or plainly depends on missing external evidence, send it back to the chairman once with that note. If the second attempt still fails the check, treat the gate as INSUFFICIENT and state the specific missing information or evidence in the verdict.
 
 ## What Round 2 advisors receive
 
 New sub-agents, not the Round 1 advisors. They carry no memory of Round 1.
 
 **They receive:**
-- The framed question (the same one Round 1 used).
+- The framed question.
 - The crux.
-- The chairman's "Open Questions for Round 2" section: the unresolved disagreements and weak assumptions, phrased as open questions.
+- The Round 1 Findings Handoff produced by the chairman.
+
+The handoff contains:
+- Supported findings.
+- Strong arguments.
+- Weak or rejected arguments.
+- Disagreements.
+- Critical assumptions.
+- Evidence quality.
+- Blind spots.
+- Open questions.
 
 **They do not receive:**
 - The Round 1 recommendation or verdict.
 - The chairman's interim lean.
-- Round 1 advisor responses or reviews.
+- The Round 1 confidence.
+- Any instruction to defend or overturn the Round 1 conclusion.
+- The full Round 1 advisor or reviewer transcript.
 
-Why: the point of Round 2 is to investigate the crux with fresh eyes. Showing the previous conclusion, even in passing, turns the round into a search for confirmation.
+Why: Round 2 should inherit knowledge without inheriting judgment. The findings
+prevent unnecessary repetition, while withholding the conclusion, confidence,
+and lean forces the second round to independently evaluate what actually holds.
 
-**The Outsider** receives the raw user question (trigger phrase removed) plus the crux, and nothing else. It does not get the open-questions section, since that would hand it the context it is meant to lack. If the crux can't be understood without insider context, restate it in plain language for the Outsider only, without adding the answer.
+**The Outsider** receives only the raw user question (trigger phrase removed)
+plus the crux. It does not receive the Round 1 Findings Handoff, since that would
+give it the context it is deliberately meant to lack. If the crux cannot be
+understood from the raw question alone, restate it in plain language for the
+Outsider only, without adding any Round 1 reasoning or conclusion.
 
 ## Round 2 advisor prompts
 
@@ -50,31 +68,24 @@ Use the prompt templates in `advisors.md` with these changes:
 
 **Standard advisors:** after the framed question, add:
 
-```
-The first round of analysis left one question unresolved:
+The first round produced a structured set of findings about this problem.
+
+ROUND 1 FINDINGS:
+[Round 1 Findings Handoff]
+
+The remaining crux is:
 
 CRUX: [crux]
 
-Open questions the earlier analysis did not settle:
-[open questions section]
+Use the findings to avoid repeating reasoning that is already well supported.
+However, treat every finding as something to evaluate, not as established truth.
+Pay particular attention to weak arguments, disagreements, assumptions, and
+evidence gaps.
 
-Your job is to address this crux directly from your perspective. Don't summarize
-the whole problem again. If your lens suggests the crux is badly framed, say so.
-If it can only be resolved with information the council doesn't have, say exactly
-what information and why reasoning can't supply it.
-```
-
-**Outsider:** after the raw question, add:
-
-```
-One specific question needs a fresh read:
-
-CRUX: [crux]
-
-Answer it as a stranger would, from what is in front of you.
-```
-
-The shared rules (work alone, flag assumptions, don't invent facts, 150-300 words) are unchanged.
+Your job is to determine what the reasoning actually supports about the crux.
+Don't simply agree with or overturn the first round. If the crux is badly framed,
+say so. If it requires information the council does not have, identify exactly
+what is missing and why reasoning cannot supply it.
 
 ## Round 2 peer review
 
@@ -90,14 +101,24 @@ Everything else, including the anonymization and the question 1 and 2 structure,
 Follow `chairman.md`, with these differences:
 
 - **Gates available:** `FINAL` or `INSUFFICIENT` only. `ROUND_2` is not available.
-- **Round 1 is a hypothesis, not evidence** The chairman receives the Round 1 chairman output (the verdict or interim lean, the assumptions, the disagreements) and treats it as a claim to test against Round 2, not a conclusion to confirm. Reuse a Round 1 claim only when Round 2 independently supports it. Don't carry over Round 1 confidence automatically.
-- **Inputs:** Round 1 chairman output, the crux, all five Round 2 advisor responses, all five Round 2 reviews, and the anonymization mapping. Round 1 advisor responses stay in the transcript. The chairman doesn't need them.
+- **Round 1 findings are inherited, not accepted** The chairman receives the structured Round 1 Findings Handoff and evaluates those findings against the Round 2 reasoning. A finding may be retained when Round 2 supports it, revised when Round 2 exposes a weakness, or rejected when Round 2 contradicts it.
+
+The Round 1 verdict, confidence, and interim lean are not treated as evidence and must not influence the final judgment merely because they came first.
+- **Inputs:** The framed question, the crux, the Round 1 Findings Handoff, all five Round 2 advisor responses, all five Round 2 reviews, and the anonymization mapping.
+
+The Round 1 advisor and reviewer responses may remain in the transcript for auditability, but are not required for Round 2 synthesis.
+
 - **Add this section** to the verdict body, directly after the Verdict:
 
 ```
 ## What Round 2 Changed
-[Confirmed | Revised | Unresolved]: one or two sentences. Confirmed: Round 2
-supported the Round 1 lean. Revised: Round 2 changed the answer, and why.
+[Confirmed | Revised | Unresolved]: one or two sentences.
+
+Confirmed: Round 2 independently supported the relevant Round 1 findings.
+
+Revised: Round 2 exposed a weakness, contradiction, or new consideration that
+changed one or more Round 1 findings or the resulting decision.
+
 Unresolved: Round 2 did not settle the crux.
 ```
 
