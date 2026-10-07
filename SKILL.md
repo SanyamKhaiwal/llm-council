@@ -7,7 +7,7 @@ description: "Run a question, idea, or decision through a council of 5 AI adviso
 
 One model gives one answer, and you can't tell whether it is strong or mid. The council runs a question through five advisors with deliberately different thinking styles, has them attack each other's reasoning anonymously, and has a chairman decide whether the result is reliable enough to act on.
 
-**Principle:** optimize for the most reliable decision the available information allows, not for producing an answer. If a single unresolved crux can be resolved through another round of reasoning, run it once. If the crux requires external evidence or more reasoning won't help, stop. If real-world evidence is needed, say exactly what, and don't manufacture certainty to fill the gap. Keep this in mind for any situation the reference files don't cover.
+**Principle:** optimize for the most reliable decision the available information allows, not for producing an answer. If a single unresolved crux can be resolved through another round of reasoning, run it once. If the crux is a user-specific fact that could materially change the decision, ask the user one clarification question and restart the council with the answer. If the crux requires external evidence, cannot be resolved through user clarification, or more reasoning won't help, stop. If real-world evidence is needed, say exactly what, and don't manufacture certainty to fill the gap. Keep this in mind for any situation the reference files don't cover.
 
 ## When to use it
 
@@ -18,21 +18,22 @@ Use it when being wrong is expensive and there is real uncertainty: a choice bet
 Read each reference file when you reach its stage, not before.
 
 1. **Scan context.** Read only workspace files that bear on this question (CLAUDE.md, memory, files the user attached or named, data relevant to the decision). Skip unrelated files. Do not read past council transcripts unless the user asks. If they do, treat old conclusions as hypotheses to challenge, not facts, because early conclusions otherwise anchor every later run.
-2. **Frame the question.** Write one neutral prompt: the decision, the user's context, relevant file context, and what's at stake. Don't steer. If the question is too vague to frame, ask one clarifying question, then proceed.
+2. **Frame the question.** Write one neutral prompt: the decision, the user's context, relevant file context, and what's at stake. Don't steer. If the question is too vague to frame, ask one clarifying question, then proceed. This initial clarification is separate from the chairman's `CLARIFY` gate.
 3. **Advisors (parallel).** Spawn all five at once. Four get the framed question. **The Outsider gets only the user's raw question** with the trigger phrase stripped (e.g. remove "council this:"), because an advisor given the full context isn't an outsider. See `references/advisors.md`.
 4. **Anonymous peer review (parallel).** Randomize advisor-to-letter mapping, then run five reviewers. See `references/peer-review.md`.
 5. **Chairman.** Synthesize everything and return a gate decision. Tell the chairman the Outsider had less context by design, so it doesn't penalize that response for missing detail. See `references/chairman.md`.
-6. **Route on the chairman's first line**, which is always `GATE: FINAL | ROUND_2 | INSUFFICIENT`:
+6. **Route on the chairman's first line**, which is always `GATE: FINAL | CLARIFY | ROUND_2 | INSUFFICIENT`:
    - `FINAL`: the verdict is solid. Go to step 7.
+   - `CLARIFY`: the chairman identified one user-specific piece of information that could materially change the decision. Ask the user exactly one concise clarification question. After the user answers, fold the answer into the framed question and restart from step 3. A council cycle may use the `CLARIFY` gate at most once.
    - `ROUND_2`: the chairman named one crux that reasoning can resolve. Run `references/round-2.md`, then go to step 7.
-   - `INSUFFICIENT`: the crux needs external evidence. Skip Round 2 and go to step 7.
+   - `INSUFFICIENT`: the crux requires external evidence or cannot be resolved through further reasoning or user clarification. Go to step 7.
 7. **Report.** Present the final verdict to the user. Include the reasoning needed to understand the decision, the confidence, main uncertainty, and what would change the verdict.
 
 The gate's definitions and criteria live only in `references/chairman.md`. Don't re-derive them here or elsewhere.
 
 ## Round 2 cap
 
-Round 2 is the final reasoning pass, and there is at most one per council run. Afterward the only valid gates are `FINAL` or `INSUFFICIENT`, and any remaining uncertainty goes into the verdict. If the Round 2 chairman returns `ROUND_2` anyway, re-prompt it once to finalize. If it still does, report `INSUFFICIENT` with the crux as the missing information. If the user wants to go further, they start a new council with new evidence, not a third round.
+Round 2 is the final additional reasoning pass, and there is at most one per council run. After Round 2, the chairman may return `FINAL`, `CLARIFY`, or `INSUFFICIENT`. If the chairman returns `CLARIFY`, ask the user one concise question, incorporate the answer, and restart the council from step 3. If the chairman returns `INSUFFICIENT`, report what information or evidence is missing. If the Round 2 chairman returns `ROUND_2` again, re-prompt it once to finalize. If it still does, report `INSUFFICIENT` with the crux as the missing information.
 
 ## Verdict types
 
@@ -49,4 +50,4 @@ Each verdict states confidence, the main uncertainty, and what would change it.
 - **No sub-agents available:** run the advisors one at a time as separate, clearly delimited passes, with each written without reference to earlier ones. Reviewers and chairman follow the same way. Note in the final verdict that independence is reduced.
 - **A sub-agent returns something malformed or off-task:** re-run that one agent once. If it fails again, proceed without it and disclose the omission in the final verdict.
 - **Advisors converge suspiciously fast:** all five sharing one model means agreement can be shared bias, not confirmation. The chairman should say so when agreement rests on unverified facts.
-- **User supplies new information mid-run:** fold it into the framed question and restart from step 3. Don't patch a finished run.
+- **User supplies new information mid-run:** if it answers the chairman's CLARIFY question, fold it into the framed question and restart from step 3. Do not patch a finished council run. At most one clarification question per council cycle.

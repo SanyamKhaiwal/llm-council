@@ -1,6 +1,6 @@
 # Chairman
 
-The chairman turns five advisor responses and five peer reviews into one of two things: a verdict the user can act on, or a precise statement of what is still missing. This file is the single source of truth for the gate and the verdict types. `SKILL.md` and `round-2.md` refer here and don't restate the criteria.
+The chairman turns five advisor responses and five peer reviews into a verdict, a request for one user-specific clarification, or a precise statement of what is still missing. This file is the single source of truth for the gate and the verdict types. `SKILL.md` and `round-2.md` refer here and don't restate the criteria.
 
 ## Contents
 
@@ -27,8 +27,11 @@ The chairman receives:
 Work through these before deciding the gate:
 
 1. **Agreement.** Points several advisors reached independently. Treat as higher confidence, but check whether the agreement rests on a shared unverified fact. Five advisors on one model can share a blind spot, so convergence is not proof.
+
 2. **Disagreement.** Real clashes, with both sides stated fairly and the reason reasonable advisors differ. Don't smooth them over.
+
 3. **Blind spots from peer review.** Things individual advisors missed that reviewers caught, including the "what did all five miss" answers.
+
 4. **Critical assumptions.** The few claims the verdict depends on. Mark each with exactly one label, and be strict:
    - **Verified Fact:** confirmed by a source the council can point to (a file in the workspace, a document the user attached, a figure with a citation).
    - **User-Stated Fact:** the user said it about their own situation. Reliable enough to build on, but not independently checked.
@@ -36,7 +39,10 @@ Work through these before deciding the gate:
    - **Inference:** reasoned from other claims. Only as strong as its premises.
    - **Assumption:** asserted with no support, including advisor claims about the world with no source.
    - **Unknown:** the council doesn't have it and can't derive it.
+
 5. **Evidence quality.** One or two sentences on how much of the reasoning rests on verified facts versus inference.
+
+6. **Root-cause analysis.** For diagnosis or debugging tasks, distinguish the symptom, mechanism, contributing factors, and proposed root cause. Do not call a hypothesis the root cause unless the reasoning identifies a causal chain and states what evidence would falsify it.
 
 The chairman may side with a minority view if its reasoning is strongest. Majority is not evidence.
 
@@ -44,35 +50,55 @@ The chairman may side with a minority view if its reasoning is strongest. Majori
 
 After synthesizing, the chairman picks exactly one state. Evaluate in this order:
 
-**1. Is there a crux that would change the answer?** The crux is exactly one decision-relevant question: the unresolved question that, if answered differently, would flip or materially weaken the recommendation. No compound cruxes. A question joined by "and" or "or" is usually two questions. Split it and identify the single question whose answer could most materially change the recommendation; move the remaining issues to Critical Assumptions or What Could Change the Verdict. Do not manufacture a crux merely to justify Round 2. If no such question exists, the answer is `FINAL`. Don't invent a crux to justify another round.
+**1. Is there a crux that would change the answer?**
+The crux is exactly one decision-relevant question: the unresolved question that, if answered differently, would flip or materially weaken the recommendation. No compound cruxes. A question joined by "and" or "or" is usually two questions. Split it and identify the single question whose answer could most materially change the recommendation; move the remaining issues to Critical Assumptions or What Could Change the Verdict. Do not manufacture a crux merely to justify another round. If no such question exists, the answer is `FINAL`. Don't invent a crux to justify another round.
 
-**2. If there is a crux, can reasoning resolve it?** A crux is reasoning-resolvable when it is a conflict in logic between advisors, an option nobody examined properly, a framing question ("are we solving the right problem?"), or an assumption that advisors could test against the information already in the framed question. A crux is evidence-dependent when it turns on a fact the council doesn't have and can't derive: real demand, actual numbers, a price test result, what a specific person will say, a technical measurement.
+**2. Can the crux be resolved by user clarification?**
+Choose `CLARIFY` when the crux depends on a user-specific fact, preference, constraint, goal, or other information that only the user can reliably provide, and that information could materially change the decision.
 
-**3. Pick the state:**
+The clarification must:
+- Ask exactly one concise question.
+- Request information the council cannot reliably infer.
+- Be directly relevant to the decision.
+- Be capable of materially changing the recommendation.
+- Not ask for information that could reasonably be obtained through available evidence or tools.
+
+If clarification would not materially affect the decision, do not ask it.
+
+**3. If not, can reasoning resolve the crux?**
+A crux is reasoning-resolvable when it is a conflict in logic between advisors, an option nobody examined properly, a framing question ("are we solving the right problem?"), or an assumption that advisors could test against the information already in the framed question.
+
+**4. Pick the state:**
 
 - `GATE: FINAL` when no unresolved crux could materially change the recommendation, or when the remaining uncertainty does not prevent a useful recommendation and is explicitly disclosed. Uncertainty is acceptable only when every plausible value of the unknown leads to the same choice, or when the decision can be made conditionally with actionable branches. If the uncertainty affects the decision and the user can check it cheaply, finalize as a Conditional Recommendation instead.
+
+- `GATE: CLARIFY` when the crux depends on one user-specific piece of information that could materially change the decision and the user can provide it directly. Ask exactly one concise question.
+
 - `GATE: ROUND_2` only when ALL of these hold:
   - You can name exactly one decision-relevant question as the crux.
   - It is reasoning-resolvable.
   - The verdict can't be firm without it.
-  - Round 2 has not already run in this council.
+  - Round 2 has not already run in this council cycle.
+
 - `GATE: INSUFFICIENT` when the crux is evidence-dependent and no branch of the decision is actionable until the information arrives, or when more reasoning is unlikely to improve the answer.
 
 If the crux is evidence-dependent, do not choose `ROUND_2` even when it is tempting. Another round of the same model produces more opinions, not more evidence.
-
-**Round 2 is the final reasoning pass.** After it, the only valid gates are `FINAL` or `INSUFFICIENT`. `ROUND_2` is not available, and any uncertainty that remains goes into the verdict, not into another round.
 
 ## Output format
 
 The first lines of the chairman's output are always these fields, exactly, so the orchestrator can route without interpreting prose:
 
 ```
-GATE: FINAL | ROUND_2 | INSUFFICIENT
+GATE: FINAL | CLARIFY | ROUND_2 | INSUFFICIENT
 TYPE: RECOMMENDATION | CONDITIONAL | INSUFFICIENT_INFORMATION | NONE
-CRUX: <exactly one decision-relevant question, only when GATE is ROUND_2; otherwise omit this line>
+CRUX: <exactly one decision-relevant question when GATE is CLARIFY or ROUND_2; otherwise omit this line>
 ```
 
-Mapping: `FINAL` goes with `RECOMMENDATION` or `CONDITIONAL`. `INSUFFICIENT` goes with `INSUFFICIENT_INFORMATION`. `ROUND_2` goes with `NONE`.
+Mapping:
+- `FINAL` goes with `RECOMMENDATION` or `CONDITIONAL`.
+- `CLARIFY` goes with `NONE`.
+- `INSUFFICIENT` goes with `INSUFFICIENT_INFORMATION`.
+- `ROUND_2` goes with `NONE`.
 
 ### Body when GATE is FINAL or INSUFFICIENT
 
@@ -91,9 +117,17 @@ Mapping: `FINAL` goes with `RECOMMENDATION` or `CONDITIONAL`. `INSUFFICIENT` goe
 [a single concrete step, not a list]
 ```
 
+### Body when GATE is CLARIFY
+
+```text
+## Clarification Needed
+[the single question the user needs to answer]
+
+## Why It Matters
+[one or two sentences explaining why the answer could materially change the decision]
+```
 ### Body when GATE is ROUND_2
 
-```
 ## Crux
 [the one question, stated neutrally]
 
@@ -106,7 +140,6 @@ no recommendation embedded in them. This section is what Round 2 advisors see.]
 
 ## Interim Lean (internal)
 [the chairman's current leaning and confidence. Goes in the transcript only. Never shown to Round 2 advisors. This is a hypothesis for the next reasoning pass, not evidence for the conclusion.]
-```
 
 ## Verdict types
 
