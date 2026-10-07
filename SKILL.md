@@ -41,7 +41,7 @@ Round 2 must **not** inherit the Round 1 verdict, confidence, or current leaning
 
 The Round 2 advisors should use the inherited findings to avoid repeating work that has already been done while actively challenging anything that remains uncertain or weakly supported.
 
-After Round 2, the chairman may return `FINAL`, `CLARIFY`, or `INSUFFICIENT`. If the chairman returns `CLARIFY`, ask the user one concise question, incorporate the answer, and restart the council from step 3. If the chairman returns `INSUFFICIENT`, report what information or evidence is missing. If the Round 2 chairman returns `ROUND_2` again, re-prompt it once to finalize. If it still does, report `INSUFFICIENT` with the crux as the missing information.
+After Round 2, the chairman may return `FINAL` or `INSUFFICIENT`. If the chairman returns `INSUFFICIENT`, report what information or evidence is missing. Do not run a third round.
 
 ## Verdict types
 
