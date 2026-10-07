@@ -12,7 +12,7 @@ It can ask for one missing fact.
 
 Or it can tell you **there isn't enough information to decide.**
 
-> Inspired by [Andrej Karpathy's LLM Council](https://x.com/karpathy/status/1962263486196867115).
+> Inspired by [Andrej Karpathy's LLM Council](https://github.com/karpathy/llm-council).
 
 ---
 
@@ -425,3 +425,4 @@ llm-council/
     ├── peer-review.md
     ├── chairman.md
     └── round-2.md
+```
