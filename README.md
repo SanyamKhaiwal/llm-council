@@ -45,7 +45,7 @@ Its goal is to find the strongest decision the available information supports â€
 | **Peer Review** | The five responses are shuffled and anonymously reviewed by five reviewers. | Forces the reasoning to survive criticism rather than simply count opinions. |
 | **Chairman** | The chairman synthesizes the arguments, disagreements, assumptions, evidence, and blind spots. | Produces a decision based on reasoning quality rather than majority vote. |
 | **Gate** | The chairman decides between `FINAL`, `CLARIFY`, `ROUND_2`, or `INSUFFICIENT`. | Prevents the system from forcing a conclusion when it shouldn't. |
-| **Round 2** | If one reasoning-resolvable crux remains, fresh advisors investigate it from scratch. | Gives genuine reasoning deadlocks one additional attempt without creating endless deliberation. |
+| **Round 2** | If one reasoning-resolvable crux remains, fresh advisors investigate it using Round 1's structured findings without inheriting its conclusion. | Gives genuine reasoning deadlocks one additional attempt without creating endless deliberation. |
 
 There is **no Round 3**.
 
@@ -226,7 +226,7 @@ There is one specific unresolved crux that:
 
 Round 2 uses fresh advisors and fresh peer review.
 
-The first round's verdict is treated as a hypothesis rather than something the second round should defend.
+Round 2 carries forward a structured handoff of useful Round 1 findings, while withholding the first round's verdict, confidence, and interim lean. This preserves useful context without anchoring the second round to the first round's judgment.
 
 ### `INSUFFICIENT`
 
