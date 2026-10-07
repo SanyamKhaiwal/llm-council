@@ -40,12 +40,12 @@ Its goal is to find the strongest decision the available information supports �
 
 | Stage | What happens | Why it exists |
 |---|---|---|
-| **1. Frame** | The user's question is turned into a decision-ready problem. | Prevents the council from reasoning about an ambiguous question. |
-| **2. Advisors** | Five advisors independently analyze the problem from different perspectives. | Creates multiple reasoning paths before anyone can anchor on another answer. |
-| **3. Peer Review** | The five responses are shuffled and anonymously reviewed by five reviewers. | Forces the reasoning to survive criticism rather than simply count opinions. |
-| **4. Chairman** | A chairman synthesizes the arguments, disagreements, assumptions, evidence, and blind spots. | Produces a decision based on reasoning quality rather than majority vote. |
-| **5. Gate** | The chairman decides between `FINAL`, `CLARIFY`, `ROUND_2`, or `INSUFFICIENT`. | Prevents the system from forcing a conclusion when it shouldn't. |
-| **6. Round 2** | If one reasoning-resolvable crux remains, fresh advisors investigate it from scratch. | Gives genuine reasoning deadlocks one additional attempt without creating endless deliberation. |
+| **Frame** | The user's question is turned into a decision-ready problem. | Prevents the council from reasoning about an ambiguous question. |
+| **Advisors** | Five advisors independently analyze the problem from different perspectives. | Creates multiple reasoning paths before anyone can anchor on another answer. |
+| **Peer Review** | The five responses are shuffled and anonymously reviewed by five reviewers. | Forces the reasoning to survive criticism rather than simply count opinions. |
+| **Chairman** | The chairman synthesizes the arguments, disagreements, assumptions, evidence, and blind spots. | Produces a decision based on reasoning quality rather than majority vote. |
+| **Gate** | The chairman decides between `FINAL`, `CLARIFY`, `ROUND_2`, or `INSUFFICIENT`. | Prevents the system from forcing a conclusion when it shouldn't. |
+| **Round 2** | If one reasoning-resolvable crux remains, fresh advisors investigate it from scratch. | Gives genuine reasoning deadlocks one additional attempt without creating endless deliberation. |
 
 There is **no Round 3**.
 
@@ -326,11 +326,54 @@ Use it when the decision is worth that cost.
 
 ---
 
-## Honest Assessment
+## Where It's Useful
 
-This system improves **reasoning quality**.
+LLM Council is most useful when the decision has **real tradeoffs and a meaningful cost to getting it wrong**.
 
-It does not magically create five independent experts.
+| Use case | Why it fits |
+|---|---|
+| **Software architecture** | Multiple valid approaches with different long-term tradeoffs. |
+| **Technical decisions** | Competing designs, implementation strategies, or engineering priorities. |
+| **Debugging** | Several plausible causes where identifying the actual root cause matters. |
+| **Product decisions** | Choosing between competing features, strategies, or investments. |
+| **Career decisions** | Decisions involving multiple long-term tradeoffs rather than a single obvious answer. |
+| **Project planning** | Pressure-testing plans, risks, assumptions, and execution constraints. |
+| **Business strategy** | Evaluating competing opportunities where both upside and downside matter. |
+
+The sweet spot is:
+
+> **A high-impact decision where you have enough context to reason, but you're not sure whether your reasoning is missing something important.**
+
+---
+
+## Where It's Not Useful
+
+LLM Council is intentionally **not** the answer to every question.
+
+Don't use it when the answer is primarily an external fact, such as:
+
+- current API behavior,
+- pricing,
+- benchmarks,
+- hardware specifications,
+- library bugs,
+- legal or regulatory rules,
+- current documentation,
+- or anything else that requires information the council doesn't have.
+
+Five agents reasoning harder cannot create a missing fact.
+
+**Get the evidence first. Then use the council to reason about what that evidence means.**
+
+It's also unnecessary for simple questions, calculations, definitions, summaries, translations, or straightforward coding problems.
+
+The council has real cost and latency. Use it when the decision is worth that cost.
+
+---
+
+## Limitations
+
+The council creates multiple reasoning paths, but it does **not** create five independent experts.
 
 All five advisors may still be instances of the same underlying model. They can therefore share:
 
@@ -339,42 +382,9 @@ All five advisors may still be instances of the same underlying model. They can 
 - the same hallucinations,
 - and the same model-level limitations.
 
-Peer review helps catch some of these problems.
+Peer review helps expose some of these problems, but it does not turn model-generated agreement into external evidence.
 
-It does not turn model-generated agreement into external evidence.
-
-### My assessment
-
-| Area | Assessment |
-|---|---|
-| **Decision quality** | Strong for ambiguous, high-impact decisions |
-| **Reasoning depth** | Strong |
-| **Bias / blind-spot detection** | Stronger than a single response |
-| **Uncertainty handling** | Excellent |
-| **Root-cause analysis** | Strong, especially when several causes are plausible |
-| **Evidence handling** | Good — but depends on the evidence provided |
-| **Independence** | Moderate — shared underlying model is still a limitation |
-| **Cost / latency** | High |
-| **Best value** | Decisions where a wrong call is expensive |
-| **Worst value** | Simple questions or fact lookups |
-
-### Bottom Line
-
-**For serious decisions, it is substantially more useful than simply asking the model once.**
-
-But it is not a replacement for:
-
-- real evidence,
-- domain expertise,
-- experiments,
-- testing,
-- or actually validating the decision.
-
-The council's biggest strength isn't that it produces **more answers**.
-
-It creates more opportunities to discover:
-
-> **why the obvious answer might be wrong.**
+That's why the council is best thought of as a **reasoning amplifier**, not an oracle.
 
 ---
 
