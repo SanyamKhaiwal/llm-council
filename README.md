@@ -1,104 +1,257 @@
 # LLM Council
 
-A multi-agent decision-making skill that pressure-tests important questions through five AI advisors, anonymous peer review, and a chairman that decides whether the available reasoning is strong enough to act on.
+A multi-agent decision-making skill for questions where **being wrong is costly** and the answer is not obvious.
+
+It uses **five independent advisors, anonymous peer review, and a chairman** to pressure-test a decision before giving a verdict.
 
 Inspired by [Andrej Karpathy's LLM Council](https://x.com/karpathy/status/1962263486196867115).
 
-The goal is **not to manufacture certainty**. The council is designed to find the most reliable decision the available information allows — including recognizing when there is not enough information to make a reliable call.
+> **Core idea:** the council is optimized for a reliable decision, not for producing an answer at any cost.
 
 ---
 
-## The Problem
+## What It Can Do
 
-A single AI response can sound convincing even when the reasoning is weak.
+### 1. Get five genuinely different perspectives
 
-It can also be heavily influenced by how a question is framed. Ask whether an idea is good and an AI may naturally search for reasons it could work. Ask whether the same idea is bad and it may produce an equally convincing case against it.
+Five advisors analyze the problem independently:
 
-LLM Council adds multiple reasoning passes and structured disagreement before producing a verdict.
+| Advisor | Main question |
+|---|---|
+| **Contrarian** | What could go wrong? What is most likely to fail? |
+| **First Principles** | Are we solving the right problem at all? |
+| **Expansionist** | What upside or opportunity are we overlooking? |
+| **Outsider** | What does this look like to someone with no insider context? |
+| **Executor** | Can this actually be done, and what should happen first? |
+
+They run **in parallel**, so one advisor does not anchor the others.
+
+---
+
+### 2. Separate the question from the answer
+
+Before the advisors run, the council:
+
+- reads relevant user and workspace context,
+- identifies the actual decision,
+- frames the question neutrally,
+- avoids embedding a preferred answer into the prompt.
+
+This reduces the risk of getting a different answer simply because the question was phrased differently.
+
+---
+
+### 3. Use an independent Outsider
+
+The Outsider deliberately receives only the user's raw question.
+
+It does **not** receive workspace context, memory, past results, or the council's framing.
+
+This helps catch:
+
+- hidden assumptions,
+- confusing explanations,
+- insider bias,
+- missing context,
+- alternatives that become invisible after heavy framing.
+
+---
+
+### 4. Critique the advisors anonymously
+
+After the first pass, all five responses are randomly shuffled and anonymized.
+
+Five independent reviewers then examine them without knowing which advisor wrote which response.
+
+Each reviewer looks for:
+
+1. **Strongest response** — what is its strongest claim, what supports it, what assumption it relies on, and what would falsify it?
+2. **Biggest blind spot** — what important gap could damage the decision?
+3. **What all five missed** — what should the council consider that nobody raised?
+
+This makes the system more than simply asking five models for five opinions.
+
+---
+
+### 5. Detect agreement that should not be trusted
+
+The chairman evaluates:
+
+- where the advisors agree,
+- where they disagree,
+- blind spots,
+- critical assumptions,
+- evidence quality,
+- root causes and causal chains,
+- whether a minority argument is actually stronger than the majority.
+
+**Consensus is not treated as proof.**
+
+Five advisors can share the same model bias, so agreement is treated as something to examine rather than automatically trust.
+
+---
+
+### 6. Track what is known vs assumed
+
+The chairman separates important claims into categories such as:
+
+- **Verified Fact**
+- **User-Stated Fact**
+- **Evidence**
+- **Inference**
+- **Assumption**
+- **Unknown**
+
+This helps prevent an assumption from silently turning into a "fact" during a long reasoning chain.
+
+---
+
+### 7. Perform root-cause analysis
+
+For debugging and diagnosis problems, the chairman distinguishes between:
+
+- the symptom,
+- the mechanism causing it,
+- contributing factors,
+- the proposed root cause.
+
+A proposed root cause should be supported by a causal chain and include evidence or a way it could be falsified.
+
+---
+
+### 8. Ask for clarification when the decision depends on one missing user fact
+
+The council can stop and ask **one concise clarification question** when the unresolved crux depends on information only the user can provide.
+
+After the user answers, the council restarts the reasoning cycle with that information included.
+
+It does not keep asking questions indefinitely.
+
+---
+
+### 9. Run one focused second reasoning round
+
+If the remaining uncertainty is a **single question that reasoning can resolve**, the chairman can trigger Round 2.
+
+Round 2:
+
+- uses fresh advisors,
+- does not show them the Round 1 verdict,
+- focuses only on the unresolved crux,
+- performs another anonymous peer review,
+- cannot trigger a third round.
+
+If the uncertainty requires external evidence rather than more reasoning, Round 2 is not used.
+
+---
+
+### 10. Know when to stop
+
+The council can explicitly return:
+
+**INSUFFICIENT INFORMATION**
+
+when the available reasoning cannot reliably settle the decision.
+
+It identifies:
+
+- what is unknown,
+- why reasoning cannot resolve it,
+- what evidence or information would change the decision.
+
+The system is deliberately allowed to say **"we don't know."**
 
 ---
 
 ## How It Works
 
-When the council is triggered, the skill follows a structured pipeline:
-
-1. **Scans the context** — reads only workspace files and user-provided material relevant to the decision.
-2. **Frames the question** — turns the user's situation into a neutral decision prompt without steering the outcome.
-3. **Runs five advisors in parallel** — each approaches the problem from a deliberately different reasoning perspective.
-4. **Runs anonymous peer review** — the advisors critique each other's reasoning without knowing who produced which response.
-5. **Chairman evaluation** — a chairman synthesizes the council, evaluates agreement, disagreement, assumptions, evidence quality, and blind spots, then chooses a gate:
-   - `FINAL`
-   - `ROUND_2`
-   - `INSUFFICIENT`
-6. **Optional Round 2** — if one unresolved crux can be settled through further reasoning alone, the council gets one additional reasoning pass.
-7. **Final verdict** — the user receives a recommendation, conditional recommendation, or insufficient-information result, together with confidence, the main uncertainty, and what would change the verdict.
-
-### The Outsider
-
-One advisor deliberately receives only the user's raw question rather than the full framed context.
-
-This creates a useful counterweight to the other advisors: it can expose assumptions, missing context, or obvious alternatives that become invisible once a problem has been heavily framed.
+```
+User Question
+     |
+     v
+Frame the Decision
+     |
+     +-------------------------------+
+     |                               |
+     v                               v
+4 Context-Aware Advisors        Outsider
+     |                         Raw Question Only
+     +---------------+---------------+
+                     |
+                     v
+             Anonymous Peer Review
+                     |
+                     v
+                 Chairman
+                     |
+          +----------+----------+-----------+
+          |          |          |           |
+        FINAL     CLARIFY    ROUND_2   INSUFFICIENT
+          |          |          |           |
+          |          |          v           |
+          |          |    Fresh reasoning   |
+          |          |    + peer review     |
+          |          |          |            |
+          |          +----> Restart         |
+          |                                 |
+          +---------------+-----------------+
+                          |
+                          v
+                       Verdict
+```
 
 ---
 
-## The Council's Safety Valves
+## The Chairman's Verdict
 
-The council is deliberately designed to avoid turning agreement into false confidence.
+The final result can be:
 
-### It can say "we don't know"
+### Recommendation
+The council has enough support to recommend a course of action.
 
-If the available reasoning cannot reliably resolve the decision, the final verdict can be:
+### Conditional Recommendation
+The council recommends an action, but the decision depends on a specific assumption that should be checked.
 
-**INSUFFICIENT INFORMATION**
+### Insufficient Information
+The available information is not enough to make a reliable recommendation.
 
-The council identifies what information is missing and what should be done next rather than inventing certainty.
+The final response also explains:
 
-### Reasoning is not evidence
-
-The council distinguishes between:
-
-- **Evidence** — data, observations, workspace material, or user-provided information supporting a claim.
-- **Reasoning** — conclusions and inferences produced by the advisors.
-
-Five advisors reaching the same conclusion is still not external evidence.
-
-### Majority is not proof
-
-The chairman can reject the majority view when a minority argument has stronger reasoning.
-
-Agreement can also reflect shared model bias, so consensus is treated as something to evaluate — not proof by itself.
-
-### One-round cap
-
-Round 2 is the final additional reasoning pass.
-
-If the remaining uncertainty requires new external evidence rather than more reasoning, the council stops and reports what evidence is needed. There is no automatic third reasoning round.
+- where the council agrees,
+- where it clashes,
+- critical assumptions,
+- evidence quality,
+- blind spots,
+- what could change the verdict,
+- the **one thing to do first**.
 
 ---
 
 ## When To Use It
 
-LLM Council is useful when **being wrong is expensive** and the decision contains genuine uncertainty or tradeoffs.
+Use the council for decisions with **meaningful uncertainty, competing tradeoffs, or expensive failure**.
 
-### Good use cases
+Good examples:
 
-- Choosing between competing strategies or plans
-- Product, pricing, or positioning decisions
-- Evaluating whether a proposed approach is worth pursuing
-- Pressure-testing a technical or architectural decision
-- Reviewing a plan or draft where the consequences matter
-- Debugging or diagnosis where multiple root causes are plausible
-- Decisions where you want competing perspectives before committing
+- Choosing between technical architectures
+- Evaluating a product or business strategy
+- Deciding whether to pursue an idea
+- Career or project decisions with significant tradeoffs
+- Debugging where several root causes are plausible
+- Reviewing an important plan
+- Pressure-testing an argument or proposal
+- Comparing multiple approaches before committing
 
-### Skip the council for
+### Don't use it for
 
-- Factual questions with a straightforward answer
-- Simple yes/no questions
-- Routine writing or creation tasks
-- Summaries and transformations
-- Casual decisions with little meaningful tradeoff
+- Simple factual questions
+- Straightforward calculations
+- Routine writing
+- Summaries
+- Simple transformations
+- Low-stakes decisions
 
-The council is intentionally selective. More reasoning is not automatically better reasoning.
+More agents are not automatically better. The council is intentionally selective.
 
 ---
 
@@ -113,7 +266,7 @@ Explicit triggers include:
 - `stress-test this`
 - `debate this`
 
-It can also trigger for genuine decisions with meaningful tradeoffs, for example:
+It can also trigger for genuine decisions such as:
 
 - "Should I choose X or Y?"
 - "Which option is stronger?"
@@ -122,29 +275,64 @@ It can also trigger for genuine decisions with meaningful tradeoffs, for example
 - "Validate this."
 - "Get multiple perspectives."
 - "I can't decide."
-- "I'm torn between these options."
 
-A casual "should I..." question without a real decision or meaningful tradeoff does not automatically trigger the council.
+A casual question without a meaningful decision or tradeoff does not automatically require the council.
+
+---
+
+## What Makes It Different
+
+### It is not just "ask five agents"
+
+The process adds several layers of protection:
+
+- independent first-pass reasoning,
+- deliberately different reasoning lenses,
+- a reduced-context outsider,
+- anonymous peer review,
+- explicit assumption tracking,
+- evidence-vs-reasoning separation,
+- root-cause analysis,
+- chairman gating,
+- user clarification when needed,
+- one focused second reasoning round,
+- a legitimate insufficient-information outcome.
+
+### It does not manufacture certainty
+
+The council does **not** treat:
+
+- confidence as evidence,
+- consensus as proof,
+- reasoning as external evidence,
+- a majority vote as automatically correct.
+
+A minority position can win if its reasoning is stronger.
 
 ---
 
 ## Example
 
-> **council this:** I'm considering replacing the current architecture with approach B. It would take two weeks to migrate, but could reduce long-term complexity. Should I make the switch?
+```
+council this:
 
-The council does not simply answer yes or no.
+I'm considering replacing our current architecture with approach B.
+Migration would take two weeks but may reduce long-term complexity.
+Should I make the switch?
+```
 
-It pressure-tests:
+The council will examine:
 
 - what could make the migration fail,
-- whether the underlying problem actually requires the migration,
-- what upside may be overlooked,
-- what an outside observer sees without the surrounding assumptions,
-- what is realistically executable,
-- where the advisors disagree,
-- and whether the remaining uncertainty can actually be resolved.
+- whether the migration actually solves the underlying problem,
+- potential upside,
+- implementation difficulty,
+- what an outsider sees,
+- disagreements between advisors,
+- hidden assumptions,
+- and whether the remaining uncertainty can be resolved.
 
-The final output tells you what the council recommends, how confident it is, what the main uncertainty is, and what evidence or change would alter the decision.
+The output is a **decision with reasoning**, not just a vote.
 
 ---
 
@@ -162,7 +350,11 @@ llm-council/
     └── round-2.md
 ```
 
-The implementation keeps the main workflow in `SKILL.md` and separates each council stage into focused reference files.
+- `SKILL.md` — main orchestration and workflow
+- `advisors.md` — five advisor roles and prompts
+- `peer-review.md` — anonymization and review process
+- `chairman.md` — synthesis, gating, assumptions, evidence, and verdict
+- `round-2.md` — controlled second reasoning pass
 
 ---
 
@@ -174,33 +366,31 @@ Clone the repository into your agent's skills directory:
 git clone https://github.com/SanyamKhaiwal/llm-council.git ~/.claude/skills/llm-council
 ```
 
-Or copy the repository contents into the corresponding skills directory supported by your agent.
+Or copy the repository contents into the skills directory supported by your agent.
 
-The skill is designed around sub-agent orchestration and works best in an environment that supports multiple independent agent passes.
+The skill works best in an environment that supports multiple independent agent/sub-agent passes.
 
 ---
 
 ## Design Principles
 
-- **Independent first-pass reasoning** — advisors should not anchor on each other's conclusions.
-- **Different reasoning lenses** — each advisor is given a distinct role.
-- **Anonymous peer review** — critique the reasoning without relying on author identity.
-- **Reduced-context outsider** — deliberately preserve one perspective outside the main framing.
-- **Evidence discipline** — reasoning is not treated as external evidence.
-- **Chairman gate** — every run must pass through a `FINAL`, `ROUND_2`, or `INSUFFICIENT` decision.
-- **Single Round 2 cap** — additional reasoning is limited to one pass.
-- **Legitimate uncertainty** — the system is allowed to conclude that the information is insufficient.
-- **No confidence carryover** — a second round must earn its conclusion again.
-- **Majority is not proof** — the strongest reasoning can come from a minority position.
+- **Independent reasoning** — advisors do not see each other's first-pass answers.
+- **Different lenses** — each advisor is deliberately optimized for a different failure mode.
+- **Fresh outsider perspective** — one advisor sees only the raw question.
+- **Anonymous criticism** — reviewers judge reasoning rather than advisor identity.
+- **Evidence discipline** — reasoning and evidence are kept separate.
+- **Explicit uncertainty** — the council can conclude that the information is insufficient.
+- **Controlled escalation** — clarification or one Round 2 pass is used only when justified.
+- **No confidence carryover** — Round 2 must independently earn its conclusion.
+- **Minority can win** — the strongest argument matters more than vote count.
+- **No third round** — uncertainty cannot be hidden behind endless deliberation.
 
 ---
 
 ## Credit
 
 - Methodology inspired by [Andrej Karpathy's LLM Council](https://x.com/karpathy/status/1962263486196867115).
-- This implementation adapts the council concept into an installable agent skill with structured advisor roles, anonymous peer review, chairman gating, and explicit uncertainty handling.
-
----
+- This implementation adapts the council concept into an installable agent skill with structured advisor roles, anonymous peer review, chairman gating, root-cause analysis, and explicit uncertainty handling.
 
 ## License
 
