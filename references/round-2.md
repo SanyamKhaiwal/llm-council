@@ -6,6 +6,7 @@ Round 2 is a controlled, one-time second reasoning pass aimed at a single questi
 
 - When Round 2 runs and when it doesn't
 - Sanity-check the crux
+- Who runs in Round 2
 - What Round 2 advisors receive
 - Round 2 advisor prompts
 - Round 2 peer review
@@ -14,7 +15,7 @@ Round 2 is a controlled, one-time second reasoning pass aimed at a single questi
 
 ## When Round 2 runs and when it doesn't
 
-Round 2 runs only when the chairman returned `GATE: ROUND_2` with a `CRUX:` line.
+Round 2 runs only when the chairman returned `GATE: ROUND_2` with `CRUX:` and `WHY_NOT_FINAL:` lines, and the orchestrator's Round 2 check in `SKILL.md` passed.
 
 Round 2 does not run when:
 
@@ -26,12 +27,22 @@ Round 2 does not run when:
 
 Before spawning anything, read the `CRUX:` line. It must be exactly one decision-relevant question that reasoning can resolve. If it is compound (joined by "and" or "or") or plainly depends on missing external evidence, send it back to the chairman once with that note. If the second attempt still fails the check, treat the gate as INSUFFICIENT and state the specific missing information or evidence in the verdict.
 
+## Who runs in Round 2
+
+Round 2 is narrower than Round 1, so it is smaller:
+
+- **3 advisors.** Seat the three whose lenses bear most directly on the crux. Default to the core three (Contrarian, First Principles, Executor). Swap one for the Expansionist if the crux is about upside or opportunity, or for the Outsider if it is about how something reads to people without context.
+- **1 reviewer**, with no focus line.
+- **1 chairman.**
+
+That is 5 calls. Don't expand it.
+
 ## What Round 2 advisors receive
 
 New sub-agents, not the Round 1 advisors. They carry no memory of Round 1.
 
 **They receive:**
-- The framed question.
+- The framed question, including the Evidence Brief.
 - The crux.
 - The Round 1 Findings Handoff produced by the chairman.
 
@@ -89,10 +100,10 @@ what is missing and why reasoning cannot supply it.
 
 ## Round 2 peer review
 
-Follow `peer-review.md` with a new random shuffle. Keep all of its rules, including anonymization, reviewer independence, and the reviewer output requirements. Make only these two changes:
+Follow `peer-review.md` with a new random shuffle and one reviewer. Keep all of its rules, including anonymization, reviewer independence, and the reviewer output requirements. Make only these two changes:
 
 - Add the crux to the reviewer prompt, after the framed question: "The council is investigating this specific crux: [crux]."
-- Reword question 3 to: "What did all five miss about the crux?"
+- Reword question 3 to: "What did all of them miss about the crux?"
 
 Everything else, including the anonymization and the question 1 and 2 structure, is unchanged.
 
@@ -104,23 +115,11 @@ Follow `chairman.md`, with these differences:
 - **Round 1 findings are inherited, not accepted** The chairman receives the structured Round 1 Findings Handoff and evaluates those findings against the Round 2 reasoning. A finding may be retained when Round 2 supports it, revised when Round 2 exposes a weakness, or rejected when Round 2 contradicts it.
 
 The Round 1 verdict, confidence, and interim lean are not treated as evidence and must not influence the final judgment merely because they came first.
-- **Inputs:** The framed question, the crux, the Round 1 Findings Handoff, all five Round 2 advisor responses, all five Round 2 reviews, and the anonymization mapping.
+- **Inputs:** The framed question, the crux, the Round 1 Findings Handoff, the three Round 2 advisor responses, the Round 2 review, and the anonymization mapping.
 
 The Round 1 advisor and reviewer responses may remain in the transcript for auditability, but are not required for Round 2 synthesis.
 
-- **Add this section** to the verdict body, directly after the Verdict:
-
-```
-## What Round 2 Changed
-[Confirmed | Revised | Unresolved]: one or two sentences.
-
-Confirmed: Round 2 independently supported the relevant Round 1 findings.
-
-Revised: Round 2 exposed a weakness, contradiction, or new consideration that
-changed one or more Round 1 findings or the resulting decision.
-
-Unresolved: Round 2 did not settle the crux.
-```
+- **Report:** use the same user report template as Round 1. Record what Round 2 did (Confirmed, Revised, or Unresolved) in the report's footer line, not as a separate section. See "Round 2 chairman prompt" in `chairman.md`.
 
 ## If uncertainty remains
 

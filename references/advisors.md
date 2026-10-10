@@ -1,6 +1,8 @@
 # Advisors
 
-Five advisors analyze the question independently and in parallel. They are thinking styles, not job titles, and they are chosen to create tension: Contrarian vs Expansionist (downside vs upside), First Principles vs Executor (rethink everything vs just do it), with the Outsider in the middle seeing what fresh eyes see.
+Up to five advisors analyze the question independently and in parallel. They are thinking styles, not job titles, and they are chosen to create tension: Contrarian vs Expansionist (downside vs upside), First Principles vs Executor (rethink everything vs just do it), with the Outsider in the middle seeing what fresh eyes see.
+
+Not every council seats all five. The tier from `triage.md` decides how many run and which ones. The Contrarian, First Principles Thinker and Executor are seated in every tier.
 
 ## Contents
 
@@ -11,12 +13,13 @@ Five advisors analyze the question independently and in parallel. They are think
 
 ## Shared rules
 
-- **Work alone.** An advisor never sees another advisor's output at this stage. Seeing earlier answers anchors later ones, which is why all five run at the same time.
+- **Work alone.** An advisor never sees another advisor's output at this stage. Seeing earlier answers anchors later ones, which is why all seated advisors run at the same time.
 - **Lean fully into your lens.** Commit to your strongest analysis and don't dilute it with artificial balance. State genuine uncertainty when it materially affects the conclusion; the chairman handles the final balance.
 - **Be specific to the situation.** Use the framed context. Generic advice that would fit any user is a failed response.
 - **Flag what you are assuming.** When a point depends on a fact you weren't given, say "assuming X" instead of stating X as true. The chairman sorts claims by how well supported they are, and this makes that possible.
 - **Never invent facts.** No made-up numbers, studies, or sources. If something matters and isn't known, say it is unknown.
-- **Format:** 150-300 words, plain prose, no headers, no preamble. Start with the analysis. One short list is fine if it genuinely helps.
+- **Use the Evidence Brief.** When the framed question includes one, treat its `Confirmed` items as facts and cite them by ID (`per E2`). Don't contradict a Confirmed item without saying why. Treat `Partial`, `Conflicting` and `Not found` items as open. Claims outside the brief still get "assuming X".
+- **Format:** 120-220 words, plain prose, no headers, no preamble. Start with the analysis. One short list is fine if it genuinely helps.
 
 ## The five advisors
 
@@ -74,9 +77,10 @@ it materially affects your conclusion. The other advisors cover the angles you
 aren't covering.
 
 If a point depends on a fact you weren't given, say "assuming X" rather than
-stating X as true. Do not invent numbers, studies, or sources.
+stating X as true. Do not invent numbers, studies, or sources. If the question
+includes an Evidence Brief, cite its items by ID ("per E2") when you rely on them.
 
-150-300 words. Plain prose. No preamble. Go straight into your analysis.
+120-220 words. Plain prose. No preamble. Go straight into your analysis.
 ```
 
 ### Outsider
@@ -96,5 +100,5 @@ everyone else. Do not guess the missing context, do not ask questions back, and
 do not pretend to expertise you don't have. If you can't tell what is being
 asked or offered, that is your finding.
 
-150-300 words. Plain prose. No preamble.
+120-220 words. Plain prose. No preamble.
 ```
