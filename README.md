@@ -201,3 +201,7 @@ llm-council/
 ```
 
 MIT License · see [LICENSE](LICENSE)
+
+## Contributing and security
+
+Contributions and reproducible bug reports are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the contribution workflow and [SECURITY.md](SECURITY.md) for private security-reporting guidance.
